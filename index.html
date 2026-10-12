@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เป็นแฟนกันนะ ❤️</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti for Celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Mitr Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Mitr', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: #fff0f5;
+            background-image: radial-gradient(#ffb6c1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        /* Pulse glow animation for scan button */
+        @keyframes heartPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.4); }
+            70% { transform: scale(1.04); box-shadow: 0 0 0 18px rgba(255, 105, 180, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
+        }
+
+        .pulse-heart {
+            animation: heartPulse 2s infinite;
+        }
+
+        /* Laser scanner animation */
+        @keyframes scanLaser {
+            0% { top: 10%; opacity: 0.2; }
+            50% { top: 85%; opacity: 0.9; }
+            100% { top: 10%; opacity: 0.2; }
+        }
+
+        .laser-line {
+            position: absolute;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ff1493, #ff69b4, #ff1493, transparent);
+            box-shadow: 0 0 12px #ff1493, 0 0 6px #ff69b4;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .laser-active .laser-line {
+            display: block;
+            animation: scanLaser 1.4s ease-in-out infinite;
+        }
+
+        /* Stamp rotate animation */
+        @keyframes stampAnim {
+            0% { transform: scale(3) rotate(-25deg); opacity: 0; }
+            100% { transform: scale(1) rotate(-8deg); opacity: 0.95; }
+        }
+
+        .approved-stamp {
+            animation: stampAnim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Cute floating & breathing animation for the couple photo */
+        @keyframes coupleFloat {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(-6px) rotate(-1.5deg) scale(1.02); }
+            50% { transform: translateY(-10px) rotate(0deg) scale(1.03); }
+            75% { transform: translateY(-4px) rotate(1.5deg) scale(1.01); }
+            100% { transform: translateY(0px) rotate(0deg) scale(1); }
+        }
+
+        .couple-animated {
+            animation: coupleFloat 4s ease-in-out infinite;
+            filter: drop-shadow(0 10px 15px rgba(255, 105, 180, 0.25));
+        }
+
+        /* Floating background elements */
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-60px) scale(1.2); opacity: 0; }
+        }
+
+        .floating-heart {
+            position: absolute;
+            animation: floatUp 3s infinite ease-out;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Music & Sound Effect Toggle Floating Button -->
+    <div class="fixed top-4 right-4 z-50">
+        <button id="musicToggle" onclick="toggleBGM()" class="bg-white/90 backdrop-blur-md border-2 border-pink-300 text-pink-600 p-3 rounded-full shadow-lg hover:bg-pink-50 transition-all active:scale-95 flex items-center justify-center space-x-1.5">
+            <span id="musicIcon" class="text-xl">🎵</span>
+            <span id="musicText" class="text-xs font-semibold pr-1">เปิดเพลง</span>
+        </button>
+    </div>
+
+    <div class="relative w-full max-w-md bg-white/90 backdrop-blur-md border-2 border-pink-200 rounded-3xl p-6 md:p-8 shadow-2xl transition-all duration-500 overflow-hidden">
+        
+        <!-- Background heart decorations -->
+        <div class="absolute -top-6 -right-6 text-pink-100 text-7xl select-none pointer-events-none">💖</div>
+        <div class="absolute -bottom-6 -left-6 text-pink-100 text-7xl select-none pointer-events-none">💕</div>
+
+        <!-- ==================== STEP 1: SCANNER ==================== -->
+        <div id="step1" class="flex flex-col items-center text-center space-y-5">
+            <span class="inline-block px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-semibold tracking-wide">STEP 01/04</span>
+            <h1 class="text-2xl font-bold text-gray-800">เอานิ้วมาแตะตรงนี้หน่อย 👆</h1>
+            <p class="text-sm text-pink-500 font-medium">แตะค้างไว้ที่หัวใจเพื่อสแกนความรัก...</p>
+
+            <!-- Heart Fingerprint Scanner Button -->
+            <div id="scanContainer" class="relative my-4 cursor-pointer">
+                <div id="scanBtn" class="pulse-heart relative w-44 h-44 bg-pink-50 hover:bg-pink-100/80 border-4 border-dashed border-pink-400 rounded-full flex items-center justify-center transition-all duration-300 shadow-inner overflow-hidden active:scale-95">
+                    
+                    <!-- Laser Line Effect -->
+                    <div class="laser-line"></div>
+
+                    <!-- Heart Fingerprint SVG Asset -->
+                    <svg class="w-28 h-28 text-pink-500 transition-transform duration-300 pointer-events-none drop-shadow-sm" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                        <path d="M50 88 C20 68, 8 48, 8 30 A 22 22 0 0 1 50 20 A 22 22 0 0 1 92 30 C92 48, 80 68, 50 88 Z" stroke-width="2.5" stroke-linecap="round" fill="rgba(255, 192, 203, 0.2)"/>
+                        <path d="M50 78 C28 61, 16 45, 16 31 A 15 15 0 0 1 50 23 A 15 15 0 0 1 84 31 C84 45, 72 61, 50 78 Z" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M50 68 C34 53, 24 40, 24 32 A 9 9 0 0 1 50 26 A 9 9 0 0 1 76 32 C76 40, 66 53, 50 68 Z" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M50 58 C40 47, 32 37, 32 33 A 5 5 0 0 1 50 29 A 5 5 0 0 1 68 33 C68 37, 60 47, 50 58 Z" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M50 48 C46 43, 42 38, 42 35 A 2.5 2.5 0 0 1 50 32.5 A 2.5 2.5 0 0 1 58 35 C58 38, 54 43, 50 48 Z" stroke-width="2" stroke-linecap="round" fill="currentColor"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="w-full space-y-2">
+                <div class="w-full bg-pink-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-pink-200">
+                    <div id="progressBar" class="bg-gradient-to-r from-pink-400 to-rose-500 h-full rounded-full w-0 transition-all duration-75 shadow-sm"></div>
+                </div>
+                <p id="scanStatus" class="text-xs text-gray-500 font-medium">กดค้างไว้เพื่อเริ่มสแกน...</p>
+            </div>
+        </div>
+
+        <!-- ==================== STEP 2: SCAN RESULT ==================== -->
+        <div id="step2" class="hidden flex-col items-center text-center space-y-5">
+            <span class="inline-block px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-semibold tracking-wide">STEP 02/04</span>
+            
+            <div class="text-6xl my-1 animate-bounce">💖</div>
+            
+            <div class="space-y-2">
+                <p class="text-xs text-pink-500 font-medium uppercase tracking-wider">ผลการตรวจวัดความรัก</p>
+                <h2 class="text-2xl font-bold text-gray-800">เธอเหมาะสมกับเรามากที่สุด!</h2>
+                <p class="text-sm text-gray-600">อยากจะชวนมาเป็นแฟนกันนะ รู้ตัวหรือเปล่า? ✨</p>
+            </div>
+
+            <div class="w-full space-y-3 pt-4">
+                <button onclick="goToStep(3)" class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold rounded-2xl shadow-lg shadow-pink-200 hover:shadow-pink-300 transition-all duration-200 transform active:scale-95 flex items-center justify-center space-x-2">
+                    <span>ผ่าน 🌸</span>
+                </button>
+                <button onclick="showRetryToast()" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-medium rounded-xl transition-all duration-200">
+                    ขอทดสอบซ้ำอีกครั้ง (กดไม่ได้หรอกนะ)
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== STEP 3: CERTIFICATE & NAME INPUT ==================== -->
+        <div id="step3" class="hidden flex-col items-center text-center space-y-4">
+            <span class="inline-block px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-semibold tracking-wide">STEP 03/04</span>
+            
+            <h2 class="text-xl font-bold text-gray-800">ลงชื่อในใบรับรองความรัก 📝</h2>
+
+            <!-- Certificate Box -->
+            <div class="relative w-full bg-pink-50/70 border-2 border-dashed border-pink-300 rounded-2xl p-5 text-center space-y-3 shadow-inner">
+                <p class="text-xs text-pink-600 font-medium">ใบรับรองการเป็นแฟน</p>
+                <p class="text-xs text-gray-500">ฉบับนี้มอบให้กับผู้ครอบครองหัวใจ 💕</p>
+                
+                <div class="my-2">
+                    <input type="text" id="partnerNameInput" placeholder="พิมพ์ชื่อเธอตรงนี้เลย..." 
+                           class="w-full px-4 py-2.5 text-center text-pink-600 font-bold bg-white border-2 border-pink-300 focus:border-pink-500 rounded-xl outline-none transition-all placeholder:font-normal placeholder:text-gray-300 text-base shadow-sm">
+                </div>
+
+                <div class="text-xs text-gray-500 space-y-1">
+                    <p>สถานะ: <span class="font-semibold text-pink-500">ผ่านการตรวจสอบหัวใจแล้ว</span></p>
+                </div>
+
+                <!-- Approved Stamp -->
+                <div class="absolute -bottom-2 -right-2 approved-stamp pointer-events-none">
+                    <div class="border-2 border-rose-600 text-rose-600 px-3 py-1 rounded-lg font-black text-xs tracking-widest uppercase bg-white/90 shadow-sm">
+                        APPROVED ❤️
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="saveNameAndProceed()" class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold rounded-2xl shadow-lg shadow-pink-200 transition-all duration-200 transform active:scale-95">
+                ไปขั้นตอนถัดไป ➔
+            </button>
+        </div>
+
+        <!-- ==================== STEP 4: PROPOSAL & EVASIVE BUTTON ==================== -->
+        <div id="step4" class="hidden flex-col items-center text-center space-y-4">
+            <span class="inline-block px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-semibold tracking-wide">FINAL STEP</span>
+            
+            <!-- Cute Mascot Illustration -->
+            <div class="relative w-28 h-28 flex items-center justify-center my-1">
+                <svg viewBox="0 0 200 200" class="w-full h-full filter drop-shadow-md">
+                    <circle cx="65" cy="65" r="20" fill="#f4a261"/>
+                    <circle cx="135" cy="65" r="20" fill="#f4a261"/>
+                    <circle cx="65" cy="65" r="12" fill="#e76f51"/>
+                    <circle cx="135" cy="65" r="12" fill="#e76f51"/>
+                    <ellipse cx="100" cy="110" rx="50" ry="45" fill="#f4a261"/>
+                    <ellipse cx="100" cy="118" rx="25" ry="20" fill="#fff"/>
+                    <ellipse cx="100" cy="110" rx="7" ry="5" fill="#2b2d42"/>
+                    <circle cx="85" cy="100" r="5" fill="#2b2d42"/>
+                    <circle cx="115" cy="100" r="5" fill="#2b2d42"/>
+                    <ellipse cx="75" cy="110" rx="6" ry="4" fill="#ff70a6" opacity="0.6"/>
+                    <ellipse cx="125" cy="110" rx="6" ry="4" fill="#ff70a6" opacity="0.6"/>
+                    <path d="M100 150 C80 130, 65 115, 65 102 A 12 12 0 0 1 100 95 A 12 12 0 0 1 135 102 C135 115, 120 130, 100 150 Z" fill="#ff4d6d"/>
+                </svg>
+            </div>
+
+            <div class="space-y-1">
+                <p id="proposalTitle" class="text-xs text-pink-500 font-medium">สวัสดีคุณคนน่ารัก</p>
+                <h2 class="text-2xl font-bold text-gray-800">เป็นแฟนกับเราได้ไหม? 🌸</h2>
+                <p class="text-xs text-gray-500">สัญญาว่าจะดูแลให้ดีที่สุดเลย!</p>
+            </div>
+
+            <!-- Action Buttons Area -->
+            <div id="buttonArea" class="relative w-full min-h-[120px] pt-2 flex flex-col items-center">
+                <button onclick="acceptProposal()" class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold rounded-2xl shadow-lg shadow-pink-200 transition-all duration-200 transform active:scale-95 z-10">
+                    ตกลงเป็นแฟนกัน 💖
+                </button>
+                
+                <!-- Evasive Button -->
+                <button id="noBtn" 
+                        onmouseenter="evadeButton()" 
+                        onclick="evadeButton()" 
+                        ontouchstart="evadeButton(event)"
+                        class="absolute bottom-2 py-2.5 px-6 bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-medium rounded-xl transition-all duration-150 ease-out z-20">
+                    ขอคิดดูก่อนนะ 🙈
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== STEP 5: FINAL CELEBRATION ==================== -->
+        <div id="step5" class="hidden flex-col items-center text-center space-y-4 relative">
+            
+            <!-- 📸 ส่วนแสดงรูปภาพฉลองความเป็นแฟน -->
+<div class="relative group my-2">
+    <div class="relative overflow-hidden rounded-2xl bg-white border-4 border-pink-200 shadow-md">
+        <!-- ⭐️ วิธีแก้: ใส่เฉพาะ Direct Link ของรูปภาพใน src ⭐️ -->
+        <img src="https://i.ibb.co/KcJgmb13/BT.png" 
+             alt="Our Celebration Picture" 
+             class="w-56 md:w-64 h-48 md:h-56 object-cover couple-animated rounded-xl"
+             onerror="this.src='https://placehold.co/400x300/ffb6c1/ffffff?text=Our+Love+Story+❤️'">
+    </div>
+
+                <!-- หัวใจลอยรอบๆ รูป -->
+                <div class="floating-heart text-pink-500 text-xl" style="top: 10%; left: -10%; animation-delay: 0s;">💖</div>
+                <div class="floating-heart text-rose-400 text-2xl" style="top: 40%; right: -12%; animation-delay: 1s;">💕</div>
+                <div class="floating-heart text-pink-400 text-lg" style="bottom: 10%; left: -8%; animation-delay: 2s;">🌸</div>
+            </div>
+
+            <h2 class="text-2xl font-extrabold text-pink-600">เย้! เราเป็นแฟนกันแล้วนะ 🥰</h2>
+            
+            <!-- Final Love Certificate -->
+            <div class="relative w-full bg-pink-50/90 border-2 border-pink-300 rounded-2xl p-5 text-center space-y-2 shadow-lg">
+                <p class="text-xs text-pink-500 font-bold uppercase tracking-wider">ใบรับรองความรักฉบับสมบูรณ์</p>
+                <h3 id="finalPartnerName" class="text-2xl font-black text-rose-600 my-1">คุณคนน่ารัก</h3>
+                <p class="text-xs text-gray-600 font-medium">ตกลงเป็นแฟนกับเราเรียบร้อยแล้ว ✨</p>
+                <p class="text-[11px] text-gray-400">ห้ามเปลี่ยนใจแล้วนะ!</p>
+
+                <div class="pt-2">
+                    <span class="inline-block border-2 border-rose-600 text-rose-600 px-4 py-1.5 rounded-lg font-black text-xs tracking-widest uppercase bg-white shadow-sm rotate-[-5deg]">
+                        APPROVED & LOCKED ❤️
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-xs text-pink-400 font-medium pt-1">ขอบคุณที่เข้ามาเป็นความสุขของเรานะ 💖</p>
+        </div>
+
+    </div>
+
+    <script>
+        // State variables
+        let scanProgress = 0;
+        let scanTimer = null;
+        let partnerName = "คนน่ารัก";
+        let isAudioPlaying = false;
+        let audioCtx = null;
+        let bgmInterval = null;
+
+        const scanContainer = document.getElementById('scanContainer');
+        const progressBar = document.getElementById('progressBar');
+        const scanStatus = document.getElementById('scanStatus');
+
+        // ================= Web Audio API synthesized Cute Music Box =================
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Play short synthesized sound effect
+        function playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.15) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Play cute pop sound for button clicks
+        function playPopSound() {
+            initAudio();
+            playTone(587.33, 'sine', 0.1, 0.2); // D5
+            setTimeout(() => playTone(880, 'sine', 0.15, 0.2), 60); // A5
+        }
+
+        // Play celebratory chime sound
+        function playCelebrationSound() {
+            initAudio();
+            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+            notes.forEach((freq, idx) => {
+                setTimeout(() => playTone(freq, 'triangle', 0.3, 0.25), idx * 100);
+            });
+        }
+
+        // Background Music Box Melody Generator (Sweet & Cute Chimes)
+        const bgmMelody = [
+            523.25, 659.25, 783.99, 659.25, 880.00, 783.99, 659.25, 587.33,
+            523.25, 659.25, 783.99, 1046.50, 987.77, 783.99, 880.00, 1046.50
+        ];
+        let melodyIndex = 0;
+
+        function startBGM() {
+            initAudio();
+            isAudioPlaying = true;
+            document.getElementById('musicIcon').innerText = '🎶';
+            document.getElementById('musicText').innerText = 'ปิดเพลง';
+
+            if (bgmInterval) clearInterval(bgmInterval);
+            bgmInterval = setInterval(() => {
+                if (isAudioPlaying) {
+                    const freq = bgmMelody[melodyIndex % bgmMelody.length];
+                    playTone(freq, 'sine', 0.35, 0.08);
+                    melodyIndex++;
+                }
+            }, 320);
+        }
+
+        function stopBGM() {
+            isAudioPlaying = false;
+            document.getElementById('musicIcon').innerText = '🎵';
+            document.getElementById('musicText').innerText = 'เปิดเพลง';
+            if (bgmInterval) {
+                clearInterval(bgmInterval);
+                bgmInterval = null;
+            }
+        }
+
+        function toggleBGM() {
+            if (isAudioPlaying) {
+                stopBGM();
+            } else {
+                startBGM();
+            }
+        }
+
+        // ================= Scanner Logic =================
+        function startScanning(e) {
+            if (e) e.preventDefault();
+            initAudio();
+            if (!isAudioPlaying) startBGM(); // Auto start background music on interaction
+
+            scanContainer.classList.add('laser-active');
+            
+            clearInterval(scanTimer);
+            scanTimer = setInterval(() => {
+                if (scanProgress < 100) {
+                    scanProgress += 2.5;
+                    progressBar.style.width = `${scanProgress}%`;
+                    scanStatus.innerText = `กำลังตรวจวัดระดับความรัก... ${Math.floor(scanProgress)}%`;
+                    if (Math.floor(scanProgress) % 10 === 0) {
+                        playTone(400 + scanProgress * 5, 'sine', 0.08, 0.05);
+                    }
+                } else {
+                    clearInterval(scanTimer);
+                    scanStatus.innerText = 'สแกนสำเร็จ 100%! 💕';
+                    scanContainer.classList.remove('laser-active');
+                    
+                    playCelebrationSound();
+                    
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                    
+                    setTimeout(() => {
+                        goToStep(2);
+                    }, 400);
+                }
+            }, 40);
+        }
+
+        function stopScanning() {
+            scanContainer.classList.remove('laser-active');
+            clearInterval(scanTimer);
+            if (scanProgress < 100) {
+                scanProgress = 0;
+                progressBar.style.width = '0%';
+                scanStatus.innerText = 'กดค้างไว้เพื่อเริ่มสแกน...';
+            }
+        }
+
+        // Event listeners for scanner button (Mouse & Touch)
+        scanContainer.addEventListener('mousedown', startScanning);
+        scanContainer.addEventListener('mouseup', stopScanning);
+        scanContainer.addEventListener('mouseleave', stopScanning);
+        
+        scanContainer.addEventListener('touchstart', startScanning);
+        scanContainer.addEventListener('touchend', stopScanning);
+
+        // ================= Step Navigation =================
+        function goToStep(stepNumber) {
+            playPopSound();
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`step${i}`);
+                if (el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
+            }
+            const target = document.getElementById(`step${stepNumber}`);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('flex');
+            }
+        }
+
+        function showRetryToast() {
+            playPopSound();
+            alert('ปุ่มนี้กดไม่ได้หรอกนะ ต้องกดผ่านเท่านั้น! ✨');
+        }
+
+        function saveNameAndProceed() {
+            const inputVal = document.getElementById('partnerNameInput').value.trim();
+            if (inputVal !== "") {
+                partnerName = inputVal;
+            }
+            document.getElementById('proposalTitle').innerText = `สวัสดีคุณ "${partnerName}" 💖`;
+            goToStep(4);
+        }
+
+        // ================= Evasive Button Logic =================
+        function evadeButton(e) {
+            if (e) e.preventDefault();
+            playTone(300, 'sine', 0.05, 0.1);
+            
+            const noBtn = document.getElementById('noBtn');
+            const container = document.getElementById('buttonArea');
+            
+            const containerRect = container.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+
+            const maxX = (containerRect.width / 2) - (btnRect.width / 2) - 10;
+            const maxY = 50;
+
+            const randomX = (Math.random() - 0.5) * 2 * maxX;
+            const randomY = (Math.random() - 0.5) * 2 * maxY;
+
+            noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+        }
+
+        // ================= Final Proposal Accept =================
+        function acceptProposal() {
+            document.getElementById('finalPartnerName').innerText = `คุณ${partnerName}`;
+            playCelebrationSound();
+            goToStep(5);
+
+            // Launch Heart Confetti Effect
+            const duration = 3.5 * 1000;
+            const animationEnd = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 6,
+                    angle: 60,
+                    spread: 60,
+                    origin: { x: 0 },
+                    colors: ['#ff69b4', '#ff1493', '#ff007f', '#ffc0cb']
+                });
+                confetti({
+                    particleCount: 6,
+                    angle: 120,
+                    spread: 60,
+                    origin: { x: 1 },
+                    colors: ['#ff69b4', '#ff1493', '#ff007f', '#ffc0cb']
+                });
+
+                if (Date.now() < animationEnd) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
+    </script>
+</body>
+</html>
